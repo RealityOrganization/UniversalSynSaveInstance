@@ -4,7 +4,10 @@
 -- https://discord.gg/wx4ThpAsmw
 
 local realcheck = true
-if string.find(identifyexecutor(), "Solara") then realcheck = false end
+local executor = identifyexecutor()
+if string.find(executor, "Solara") or string.find(executor, "Orion") or string.find(executor, "Xeno") or string.find(executor, "Codex") or string.find(executor, "Delta") then
+    realcheck = false
+end
 
 local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 local table = table
