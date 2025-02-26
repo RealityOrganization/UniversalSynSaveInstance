@@ -11,6 +11,7 @@ local table = table
 local string = string
 local math = math
 local tonumber = tonumber
+local getgenv = getgenv or getfenv
 local function to_base64(data)
 	local result, bit_table = {}, {}
 	for i = 1, #data do
@@ -35,7 +36,7 @@ local function to_base64(data)
 	return table.concat(result) .. padding
 end
 
-getgenv().gethiddenpropertygethiddenproperty = gethiddenproperty
+getgenv().gethiddenproperty = gethiddenproperty or function() return nil end
 
 local game = game
 local pcall = pcall
@@ -1675,7 +1676,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 	end
 	GLOBAL_ENV.USSI = true
 	do
-		local setthreadidentity = global_container.setthreadidentity
+		local setthreadidentity = global_container.setthreadidentity or getgenv().setthreadidentity
 		if setthreadidentity then
 			pcall(setthreadidentity, 8) -- ? Arceus X Fix
 		end
@@ -1709,7 +1710,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 			"TextChatService",
 			ModuleScript = nil,
 		},
-		IgnoreDefaultPlayerScripts = EXECUTOR_NAME ~= "Wave" and true,
+		IgnoreDefaultPlayerScripts = false -- true can remove modified player or chat scripts. (EXECUTOR_NAME ~= "Wave" and true)
 		SaveBytecode = false,
 
 		IgnoreProperties = {},
@@ -2312,7 +2313,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 					result = string.gsub(result, "\0", "\\0") -- ? Some decompilers sadly output \0 which prevents files from opening
 					output = result
 				else
-					output = "--[[ Failed to decompile. Reason:\n" .. (result or "") .. "\n]]"
+					output = "--[[ Failed to decompile. Reason:\n" .. (tostring(result) or "") .. "\n]]" -- Decompilers return non-string values
 				end
 
 				if ScriptCache and hashed_bytecode then -- TODO there might(?) be an edgecase where it manages to decompile (built-in) even though getscriptbytecode failed, and the output won't get cached
@@ -2335,6 +2336,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 		return service.Players.LocalPlayer
 			or service.Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 			or service.Players.LocalPlayer
+			or (getgenv().getlocalplayer() or nil)
 	end
 
 	local function filterLinkedSource(str)
@@ -2447,9 +2449,9 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 
 		local itemstring = '<Item class="' .. className .. '" referent="' .. ref .. '"><Properties>'
 		if className == "Terrain" and realcheck then
-			writefile("SmoothGrid.txt", gethiddenpropertygethiddenproperty(workspace.Terrain, "SmoothGrid"))
+			writefile("SmoothGrid.txt", gethiddenproperty(workspace.Terrain, "SmoothGrid"))
 			task.wait()
-			writefile("PhysicsGrid.txt", gethiddenpropertygethiddenproperty(workspace.Terrain, "PhysicsGrid"))
+			writefile("PhysicsGrid.txt", gethiddenproperty(workspace.Terrain, "PhysicsGrid"))
 			task.wait(3) -- no remove?
 			local physicsgrid = to_base64(readfile("PhysicsGrid.txt"))
 			task.wait()
