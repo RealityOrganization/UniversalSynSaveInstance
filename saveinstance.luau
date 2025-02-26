@@ -1710,7 +1710,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 			"TextChatService",
 			ModuleScript = nil,
 		},
-		IgnoreDefaultPlayerScripts = false -- true can remove modified player or chat scripts. (EXECUTOR_NAME ~= "Wave" and true)
+		IgnoreDefaultPlayerScripts = false, -- true can remove modified player or chat scripts. (EXECUTOR_NAME ~= "Wave" and true)
 		SaveBytecode = false,
 
 		IgnoreProperties = {},
