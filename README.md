@@ -4,8 +4,9 @@
 # Loadstring
 
 ```lua
-local synsaveinstance = loadstring(game:HttpGet("https://raw.githubusercontent.com/RealityOrganization/UniversalSynSaveInstance/refs/heads/main/saveinstance.luau", true))()
-synsaveinstance({})
+local synsaveinstance = loadstring(game:HttpGet("https://raw.githubusercontent.com/RealityOrganization/UniversalSynSaveInstance/refs/heads/main/saveinstance.luau", true), "saveinstance")();
+local SaveinstanceOptions = {  }
+synsaveinstance(SaveinstanceOptions);
 ```
 
 # 💖 Support Their & Their Work
