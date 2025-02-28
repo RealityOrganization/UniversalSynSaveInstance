@@ -2506,7 +2506,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 		return prop_list
 	end
 
-	local CHUNK_LIMIT = 200 * 1024 * 1024 -- string length overflow prevention
+	local CHUNK_LIMIT = 100 * 1024 * 1024 -- improve??
 	local function save_cache(final)
 		local savestr = table.concat(savebuffer)
 		currentstr ..= savestr -- TODO: Causes "not enough memory" error on some exec
@@ -3173,44 +3173,23 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 				end
 			else
 				local totalstr = header
-				local s1 = ""
-				local s2 = ""
-				local s3 = ""
-				local s4 = ""
-				local c1 = table.move(chunks, 1, #chunks/4, 1, {})
-				local c2 = table.move(chunks, #chunks/4, #chunks/2, 1, {})
-				local c3 = table.move(chunks, #chunks/2, (#chunks/2) + #chunks/4, 1, {})
-				local c4 = table.move(chunks, (#chunks/2) + #chunks/4, #chunks, 1, {})
-				local yield = true
-				local yield2 = true
-				local yield3 = true
-				local yield4 = true
-				task.spawn(function()
-					for _, chunk in c1 do
-						s1 ..= chunk.str
-					end
-					yield = false
-				end)
-				task.spawn(function()
-					for _, chunk in c2 do
-						s2 ..= chunk.str
-					end
-					yield2 = false
-				end) 
-				task.spawn(function()
-					for _, chunk in c3 do
-						s3 ..= chunk.str
-					end
-					yield3 = false
-				end)
-				task.spawn(function()
-					for _, chunk in c4 do
-						s4 ..= chunk.str
-					end
-					yield4 = false
-				end) 
-				repeat task.wait() until yield == false and yield2 == false and yield3 == false and yield4 == false
-				totalstr ..= s1 .. s2 .. s3 .. s4
+                                local s1, s2, s3, s4 = "", "", "", ""
+				local c1, c2, c3, c4 = {}, {}, {}, {}
+				local len = #chunks
+                                local quarter = len // 4
+                                local half = len // 2
+                                table.move(chunks, 1, quarter, 1, c1)
+                                table.move(chunks, quarter + 1, half, 1, c2)
+                                table.move(chunks, half + 1, half + quarter, 1, c3)
+                                table.move(chunks, half + quarter + 1, len, 1, c4)
+                                local completed = 4
+                                local function process(chunks, out) for _, chunk in chunks do out ..= chunk.str end completed -= 1 end
+                                task.spawn(process, c1, s1)
+                                task.spawn(process, c2, s2)
+                                task.spawn(process, c3, s3)
+                                task.spawn(process, c4, s4)
+                                repeat task.wait() until completed == 0
+                                totalstr ..= s1 .. s2 .. s3 .. s4
 				run_with_loading(
 					"Writing " .. get_size_format() .. " to File (Depends on Exec)",
 					nil,
