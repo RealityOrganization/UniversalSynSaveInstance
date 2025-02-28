@@ -3183,7 +3183,7 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
                                 table.move(chunks, half + 1, half + quarter, 1, c3)
                                 table.move(chunks, half + quarter + 1, len, 1, c4)
                                 local completed = 4
-                                local function process(chunks, out) for _, chunk in chunks do out ..= chunk.str end completed -= 1 end
+                                local function process(chunks, out) out ..= table.concat(chunks, function(c) return c.str end) completed -= 1 end
                                 task.spawn(process, c1, s1)
                                 task.spawn(process, c2, s2)
                                 task.spawn(process, c3, s3)
