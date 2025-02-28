@@ -2132,26 +2132,12 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 		enablenilinstances()
 	end
 	local function get_size_format()
-		local Size
-
-		-- local totalsize = #totalstr
-
-		for i, unit in
-			{
-				"B",
-				"KB",
-				"MB",
-				"GB",
-				"TB",
-			}
-		do
+		local units = { "B", "KB", "MB", "GB", "TB" }
+		for i = 1, #units do
 			if totalsize < 0x400 ^ i then
-				Size = math.floor(totalsize / (0x400 ^ (i - 1)) * 10) / 10 .. " " .. unit
-				break
+				return math.floor(totalsize / (0x400 ^ (i - 1)) * 10) / 10 .. " " .. units[i]
 			end
 		end
-
-		return Size
 	end
 
 	local RunService = service.RunService
